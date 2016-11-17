@@ -9,6 +9,7 @@ import (
 
 	// Internal
 	"github.com/marksost/img/config"
+	"github.com/marksost/img/server"
 
 	// Third-party
 	log "github.com/Sirupsen/logrus"
@@ -35,12 +36,19 @@ func main() {
 	// Parse flags
 	flag.Parse()
 
+	// Start server
+	server.Start()
+
 	// Listen for and exit the application on SIGKILL or SIGINT
 	stop := make(chan os.Signal)
 	signal.Notify(stop, os.Interrupt, os.Kill)
 
 	select {
 	case <-stop:
+		// Attempt to stop the server
+		server.Stop()
+
+		// Log shut down
 		log.Info("Server is shutting down")
 	}
 }
