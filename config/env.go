@@ -131,7 +131,7 @@ func (c *Config) handleStringField(value reflect.Value, i int, flagName string, 
 // formFlagName converts a field's tag corresponding to an enviroment variable
 // into a string to use as a flag's name. Will strip the application prefix
 // and replace underscores with hypens. Will also return the name in lowercase.
-// Ex: AEON_FOO_BAR_BAZ => foo-bar-baz
+// Ex: IMG_FOO_BAR_BAZ => foo-bar-baz
 func (c *Config) formFlagName(temp string) string {
 	// Form flag name
 	name := strings.TrimPrefix(strings.ToUpper(temp), ENV_PREFIX)

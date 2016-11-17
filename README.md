@@ -1,2 +1,3 @@
 # img
-An image manipulation service written in Golang
+
+An image manipulation service written in Go
