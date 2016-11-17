@@ -1,0 +1,6 @@
+# Compiled files
+img
+
+# Coverage reports
+*.out
+*.coverprofile
