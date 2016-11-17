@@ -34,7 +34,7 @@ var _ = Describe("config.go", func() {
 			Describe("`setDefaults` method", func() {
 				It("Sets default configuration values", func() {
 					// Verify default values were set
-					Expect(c.Server.Host).To(Equal("http://img.docker"))
+					Expect(c.Server.Timeouts.Read).To(Equal(30))
 				})
 			})
 

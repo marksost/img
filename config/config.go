@@ -42,9 +42,6 @@ type (
 
 	// Struct containing configuration settings for the application server
 	Server struct {
-		// Hostname of the server
-		// NOTE: This is used when starting the application so users know how to call the application
-		Host string `json:"host" env:"SERVER_HOST"`
 		// Port the server should listen on
 		Port int `json:"port" env:"SERVER_PORT"`
 		// Various timeouts for the server
@@ -116,7 +113,6 @@ func (c *Config) setDefaults() {
 	c.Log.Level = "debug"
 
 	// Server defaults
-	c.Server.Host = "http://img.docker"
 	c.Server.Port = 6060
 	c.Server.Timeouts.Read = 30  // In seconds
 	c.Server.Timeouts.Write = 30 // In seconds
