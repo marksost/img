@@ -3,6 +3,12 @@ package server
 import (
 	// Standard lib
 	"net/http"
+
+	// Internal
+	"github.com/marksost/img/config"
+
+	// Third-party
+	"github.com/kataras/iris"
 )
 
 // Response is a struct defining the default shape of JSON responses this application
@@ -55,3 +61,23 @@ var (
 		Message: http.StatusText(http.StatusUnauthorized),
 	}
 )
+
+// JSON outputs a JSON response via the server for a number of scenarios:
+// If the environment the app is runnning is ~not~ production
+// If a non-error (i.e. 200) response is detected
+// If a "debug" param is passed with the request
+// Otherwise, an empty text response with the proper code is output
+func JSON(c *iris.Context, resp *Response) {
+	// Check if this is not a production environment, or a debug flag was enabled,
+	// or the status code is a non-error
+	if !config.GetInstance().IsProduction() ||
+		c.URLParam(DEBUG_PARAM) == "true" ||
+		resp.Code == http.StatusOK {
+		// Output JSON
+		c.JSON(resp.Code, resp)
+		return
+	}
+
+	// Output empty response as text
+	c.Text(resp.Code, "")
+}
