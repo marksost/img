@@ -14,6 +14,8 @@ import (
 )
 
 const (
+	// URL Param used to indicate a debug request
+	DEBUG_PARAM = "debug"
 	// Key to store response headers under in the request context
 	RESPONSE_HEADERS_KEY = "response-headers"
 )
@@ -43,6 +45,12 @@ func Start() {
 }
 
 func Stop() {
+	// Catch panics
+	// NOTE: These can occur when the network connection is already closed
+	defer func() {
+		_ = recover()
+	}()
+
 	// Attempt to stop the server
 	if err := server.Close(); err != nil {
 		log.WithField("error", err.Error()).Warn("Error stopping the server")
