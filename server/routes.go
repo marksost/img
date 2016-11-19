@@ -33,25 +33,24 @@ func setRoutes() {
 // not matching any other route rules
 func img(c *iris.Context) {
 	// Form new image
-	i := &image.Image{}
-
-	// Set default response
-	var resp *Response = OKResponse
+	i := image.NewImage(c)
 
 	// Process request
-	if err := i.Process(c); err != nil {
+	if err := i.Process(); err != nil {
 		// Store error code
 		code := err.(*image.ImageRequestError).Code()
 
-		resp = &Response{
+		// Write JSON output
+		JSON(c, &Response{
 			Code:    code,
 			Message: http.StatusText(code),
 			Data:    []string{err.Error()},
-		}
+		})
+		return
 	}
 
-	// Write JSON output
-	JSON(c, resp)
+	// Write output based on mime type
+	c.Render(i.MimeType(), i.Data())
 }
 
 // Handles all dis-allowed routes
