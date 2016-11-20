@@ -5,7 +5,6 @@ import (
 	// Standard lib
 	"io/ioutil"
 	"net/http"
-	"time"
 
 	// Third-party
 	. "github.com/onsi/ginkgo"
