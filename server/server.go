@@ -32,6 +32,9 @@ func Start() {
 	// Set up middleware
 	setMiddleWare()
 
+	// Set up custom serializers
+	setSerializers()
+
 	// Set up routes
 	setRoutes()
 

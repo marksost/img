@@ -12,6 +12,13 @@ import (
 	"github.com/kataras/iris"
 )
 
+const (
+	// Custom header to be set containing the MIME type of the image
+	HEADER_MIME = "X-MIME-Type"
+	// Custom header to be set containing the source URL for the image
+	HEADER_SOURCE_URL = "X-Image-Source"
+)
+
 type (
 	// Struct representing a single image to be processed from a HTTP request
 	Image struct {
@@ -51,8 +58,12 @@ func (i *Image) Process() error {
 	}
 
 	// TO-DO: Fill out process functionality
+	i.outputData = i.RawData()
 
-	return NewError(http.StatusOK, "This is a test")
+	// Set custom headers
+	i.setCustomHeaders()
+
+	return nil
 }
 
 /* End main public functionality methods */
@@ -90,4 +101,13 @@ func (i *Image) Url() *url.URL {
 /*  End utils proxy methods */
 
 /* Begin utility methods */
+
+// setCustomHeaders is used to set headers with values specific to the image
+// on the response
+func (i *Image) setCustomHeaders() {
+	// Set various custom headers with data from the image
+	i.ctx.SetHeader(HEADER_MIME, i.MimeType())
+	i.ctx.SetHeader(HEADER_SOURCE_URL, i.Url().String())
+}
+
 /* End utility methods */
