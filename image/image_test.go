@@ -2,31 +2,42 @@
 package image
 
 import (
+	// Internal
+	"github.com/marksost/img/image/utils"
+
 	// Third-party
 	"github.com/kataras/iris"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	"github.com/valyala/fasthttp"
 )
 
 var _ = Describe("image.go", func() {
 	var (
+		// Mock iris context to use within tests
+		ctx *iris.Context
 		// Mock image to test
 		i *Image
 	)
 
 	BeforeEach(func() {
+		// Create mock context
+		ctx = &iris.Context{
+			RequestCtx: &fasthttp.RequestCtx{},
+		}
+
 		// Create mock image
-		i = NewImage(&iris.Context{})
+		i = NewImage(ctx)
 	})
 
 	Describe("`NewImage` method", func() {
 		It("Returns a valid image", func() {
 			// Call method
-			i := NewImage(&iris.Context{})
+			i := NewImage(ctx)
 
 			// Verify image was properly created and returned
 			Expect(i).To(Not(BeNil()))
-			Expect(i.MimeType()).To(Equal(DEFAULT_MIME_TYPE))
+			Expect(len(i.outputData)).To(Equal(0))
 		})
 	})
 
@@ -45,36 +56,43 @@ var _ = Describe("image.go", func() {
 				Expect(string(data)).To(Equal("this is some test data"))
 			})
 		})
+	})
+
+	Describe("Image utils proxy methods", func() {
+		BeforeEach(func() {
+			// Set new utility structs to ensure predictable values
+			i.utils = &ImageUtils{
+				Downloader: utils.NewDownloader("/foo-url.com/path/to/image.jpg"),
+			}
+		})
 
 		Describe("`MimeType` method", func() {
-			Context("With no MIME type set for the image", func() {
-				BeforeEach(func() {
-					// Set empty MIME type
-					i.mimeType = ""
-				})
+			It("Returns a default MIME type", func() {
+				// Call method
+				mimeType := i.MimeType()
 
-				It("Returns a default MIME type", func() {
-					// Call method
-					mimeType := i.MimeType()
-
-					// Verify return value
-					Expect(mimeType).To(Equal(DEFAULT_MIME_TYPE))
-				})
+				// Verify return value
+				Expect(mimeType).To(Equal(utils.DEFAULT_MIME_TYPE))
 			})
+		})
 
-			Context("With a MIME type set for the image", func() {
-				BeforeEach(func() {
-					// Set non-empty MIME type
-					i.mimeType = "foo-mime"
-				})
+		Describe("`RawData` method", func() {
+			It("Returns an empty byte slice", func() {
+				// Call method
+				data := i.RawData()
 
-				It("Returns a the set MIME type", func() {
-					// Call method
-					mimeType := i.MimeType()
+				// Verify return value
+				Expect(len(data)).To(Equal(0))
+			})
+		})
 
-					// Verify return value
-					Expect(mimeType).To(Equal("foo-mime"))
-				})
+		Describe("`Url` method", func() {
+			It("Returns a `url.URL` instance", func() {
+				// Call method
+				u := i.Url()
+
+				// Verify return value
+				Expect(u.String()).To(Equal("http://foo-url.com/path/to/image.jpg"))
 			})
 		})
 	})

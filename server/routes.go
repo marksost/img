@@ -29,9 +29,22 @@ func setRoutes() {
 	server.OnError(ServerErrorResponse.Code, serverError)
 }
 
-// Handles all GEt requests to the application
+// Handles GET requests for a favicon
+func favIcon(c *iris.Context) {
+	// Serve file directly
+	c.ServeFile("./public/favicon.ico", false)
+}
+
+// Handles all GET requests to the application
 // not matching any other route rules
 func img(c *iris.Context) {
+	// Check for favicon as the request
+	// NOTE: Needed, since the system uses catch-all params
+	if c.Param("img") == "/favicon.ico" {
+		favIcon(c)
+		return
+	}
+
 	// Form new image
 	i := image.NewImage(c)
 

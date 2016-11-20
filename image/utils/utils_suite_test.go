@@ -1,5 +1,5 @@
-// Test suite setup for the helpers package
-package helpers
+// Test suite setup for the utils package
+package utils
 
 import (
 	// Standard lib
@@ -12,26 +12,13 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-type (
-	// Struct representing GetMockServer input data
-	GetMockServerTestData struct {
-		BodySubstring string
-		StatusCode    int
-	}
-	// Struct representing SliceContains input data
-	SliceContainsTestData struct {
-		Needle   string
-		Haystack []string
-	}
-)
-
-// Tests the helpers package
+// Tests the utils package
 func TestConfig(t *testing.T) {
 	// Register gomega fail handler
 	RegisterFailHandler(Fail)
 
 	// Have go's testing package run package specs
-	RunSpecs(t, "Helpers Suite")
+	RunSpecs(t, "Image Utils Suite")
 }
 
 func init() {
