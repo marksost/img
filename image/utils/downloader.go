@@ -11,11 +11,6 @@ import (
 	"strings"
 )
 
-const (
-	// The default MIME type to return when no MIME type was set from the downloaded image
-	DEFAULT_MIME_TYPE = "application/octet-stream"
-)
-
 type (
 	// Struct representing a Downloader object used for downloading resources
 	Downloader struct {
@@ -63,8 +58,9 @@ func (d *Downloader) Download() error {
 		return err
 	}
 
-	// Set raw data
+	// Set raw data and MIME type
 	d.data = data
+	d.mimeType = getMimeType(d.data)
 
 	return nil
 }
