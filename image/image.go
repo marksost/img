@@ -6,6 +6,7 @@ import (
 	"net/url"
 
 	// Internal
+	"github.com/marksost/img/image/mutableimages"
 	"github.com/marksost/img/image/utils"
 
 	// Third-party
@@ -22,13 +23,15 @@ const (
 type (
 	// Struct representing a single image to be processed from a HTTP request
 	Image struct {
-		ctx        *iris.Context // The request context this image relates to
-		outputData []byte        // The processed image as data
-		utils      *ImageUtils   // A collection of utilities used while processing a request
+		ctx          *iris.Context // The request context this image relates to
+		mutableImage mutableimages.MutableImage
+		outputData   []byte      // The processed image as data
+		utils        *ImageUtils // A collection of utilities used while processing a request
 	}
 	// Struct representing an `Image` struct's utilities used while processing a request
 	ImageUtils struct {
-		Downloader *utils.Downloader // Utility used to form URLs and download images from them
+		Downloader   *utils.Downloader          // Utility used to form URLs and download images from them
+		MutableImage mutableimages.MutableImage // The image object that handles the actual processing of the image
 	}
 )
 
@@ -50,8 +53,18 @@ func NewImage(ctx *iris.Context) *Image {
 // It will download the image, process it based on request parameters
 // and return the result
 func (i *Image) Process() error {
+	// Set error for use in this method
+	var err error
+
 	// Use downloader utility to download image from URL
-	err := i.utils.Downloader.Download()
+	err = i.utils.Downloader.Download()
+	if err != nil {
+		// Return bad request error
+		return NewError(http.StatusBadRequest, err.Error())
+	}
+
+	// Create mutable image object to process
+	i.utils.MutableImage, err = mutableimages.NewMutableImage(i.RawData(), i.MimeType())
 	if err != nil {
 		// Return bad request error
 		return NewError(http.StatusBadRequest, err.Error())
