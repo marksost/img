@@ -6,6 +6,7 @@ import (
 	"net/url"
 
 	// Internal
+	"github.com/marksost/img/helpers"
 	"github.com/marksost/img/image/mutableimages"
 	"github.com/marksost/img/image/utils"
 
@@ -14,8 +15,12 @@ import (
 )
 
 const (
+	// Custom header to be set containing the source dimensions for the image
+	HEADER_FINAL_DIMENSIONS = "X-Final-Image-Dimensions"
 	// Custom header to be set containing the MIME type of the image
 	HEADER_MIME = "X-MIME-Type"
+	// Custom header to be set containing the source dimensions for the image
+	HEADER_SOURCE_DIMENSIONS = "X-Source-Image-Dimensions"
 	// Custom header to be set containing the source URL for the image
 	HEADER_SOURCE_URL = "X-Image-Source"
 )
@@ -117,9 +122,27 @@ func (i *Image) Url() *url.URL {
 // setCustomHeaders is used to set headers with values specific to the image
 // on the response
 func (i *Image) setCustomHeaders() {
-	// Set various custom headers with data from the image
-	i.ctx.SetHeader(HEADER_MIME, i.MimeType())
-	i.ctx.SetHeader(HEADER_SOURCE_URL, i.Url().String())
+	// Map of headers to set
+	var (
+		headers map[string]string = map[string]string{
+			HEADER_MIME:       i.MimeType(),
+			HEADER_SOURCE_URL: i.Url().String(),
+		}
+	)
+
+	// Set source  and final dimensions
+	headers[HEADER_FINAL_DIMENSIONS] = helpers.Int642String(i.utils.MutableImage.GetWidth())
+	headers[HEADER_FINAL_DIMENSIONS] += "x"
+	headers[HEADER_FINAL_DIMENSIONS] += helpers.Int642String(i.utils.MutableImage.GetHeight())
+
+	headers[HEADER_SOURCE_DIMENSIONS] = helpers.Int642String(i.utils.MutableImage.Img().SourceWidth)
+	headers[HEADER_SOURCE_DIMENSIONS] += "x"
+	headers[HEADER_SOURCE_DIMENSIONS] += helpers.Int642String(i.utils.MutableImage.Img().SourceHeight)
+
+	// Loop through headers, setting each in turn
+	for k, v := range headers {
+		i.ctx.SetHeader(k, v)
+	}
 }
 
 /* End utility methods */
