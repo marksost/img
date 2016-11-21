@@ -6,10 +6,10 @@ type (
 	}
 )
 
-func NewGifMutableImage(img *ProcessableImage) (*GifMutableImage, error) {
+func NewGifMutableImage(img *ProcessableImage) *GifMutableImage {
 	return &GifMutableImage{
 		img: img,
-	}, nil
+	}
 }
 
 func (i *GifMutableImage) GetWidth() int64 {

@@ -6,10 +6,10 @@ type (
 	}
 )
 
-func NewStaticMutableImage(img *ProcessableImage) (*StaticMutableImage, error) {
+func NewStaticMutableImage(img *ProcessableImage) *StaticMutableImage {
 	return &StaticMutableImage{
 		img: img,
-	}, nil
+	}
 }
 
 func (i *StaticMutableImage) GetWidth() int64 {

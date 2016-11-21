@@ -23,10 +23,9 @@ const (
 type (
 	// Struct representing a single image to be processed from a HTTP request
 	Image struct {
-		ctx          *iris.Context // The request context this image relates to
-		mutableImage mutableimages.MutableImage
-		outputData   []byte      // The processed image as data
-		utils        *ImageUtils // A collection of utilities used while processing a request
+		ctx        *iris.Context // The request context this image relates to
+		outputData []byte        // The processed image as data
+		utils      *ImageUtils   // A collection of utilities used while processing a request
 	}
 	// Struct representing an `Image` struct's utilities used while processing a request
 	ImageUtils struct {

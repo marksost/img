@@ -38,10 +38,7 @@ type (
 
 // NewMutableImage creates a new `MutableImage` and returns it
 func NewMutableImage(data []byte, imageType string) (MutableImage, error) {
-	// Create mutable image and processable image
 	var (
-		// Set error for use in this method
-		err error
 		// Set default mutable image
 		mi MutableImage
 		// Create processable image
@@ -57,16 +54,10 @@ func NewMutableImage(data []byte, imageType string) (MutableImage, error) {
 	switch imageType {
 	case utils.GIF_MIME:
 		// Create GIF mutable image
-		mi, err = NewGifMutableImage(pi)
-		if err != nil {
-			return nil, err
-		}
+		mi = NewGifMutableImage(pi)
 	case utils.JPEG_MIME, utils.PNG_MIME, utils.TIFF_MIME:
 		// Create static mutable image
-		mi, err = NewStaticMutableImage(pi)
-		if err != nil {
-			return nil, err
-		}
+		mi = NewStaticMutableImage(pi)
 	default:
 		return nil, fmt.Errorf("Unsupported image type: %s", imageType)
 	}
