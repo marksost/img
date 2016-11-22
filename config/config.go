@@ -32,6 +32,11 @@ var (
 type (
 	// Component-specific configuration
 
+	// Struct containing configuration settings for image processing
+	Images struct {
+		DefaultQuality int `json:"default-quality" env:"IMAGE_DEFAULT_QUALITY"`
+	}
+
 	// Struct containing configuration settings for application logging
 	Log struct {
 		// The formatter to use
@@ -74,6 +79,9 @@ type (
 
 		/* Component-specific configuration */
 
+		// Settings for image processing
+		Images Images `json:"images"`
+
 		// Settings for the logger
 		Log Log `json:"log"`
 
@@ -107,6 +115,9 @@ func (c *Config) setDefaults() {
 	c.Name = "Img"
 	c.StartTime = time.Now()
 	c.Version = "v1"
+
+	// Image defaults
+	c.Images.DefaultQuality = 75
 
 	// Logger defaults
 	c.Log.Formatter = "text"

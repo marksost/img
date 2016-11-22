@@ -6,6 +6,8 @@ import (
 	"net/url"
 
 	// Internal
+	"github.com/marksost/img/helpers"
+	"github.com/marksost/img/image/mutableimages"
 	"github.com/marksost/img/image/utils"
 
 	// Third-party
@@ -13,8 +15,14 @@ import (
 )
 
 const (
+	// Custom header to be set containing the source dimensions for the image
+	HEADER_ANIMATED = "X-Animated"
+	// Custom header to be set containing the source dimensions for the image
+	HEADER_FINAL_DIMENSIONS = "X-Final-Image-Dimensions"
 	// Custom header to be set containing the MIME type of the image
 	HEADER_MIME = "X-MIME-Type"
+	// Custom header to be set containing the source dimensions for the image
+	HEADER_SOURCE_DIMENSIONS = "X-Source-Image-Dimensions"
 	// Custom header to be set containing the source URL for the image
 	HEADER_SOURCE_URL = "X-Image-Source"
 )
@@ -28,7 +36,8 @@ type (
 	}
 	// Struct representing an `Image` struct's utilities used while processing a request
 	ImageUtils struct {
-		Downloader *utils.Downloader // Utility used to form URLs and download images from them
+		Downloader   *utils.Downloader          // Utility used to form URLs and download images from them
+		MutableImage mutableimages.MutableImage // The image object that handles the actual processing of the image
 	}
 )
 
@@ -50,8 +59,18 @@ func NewImage(ctx *iris.Context) *Image {
 // It will download the image, process it based on request parameters
 // and return the result
 func (i *Image) Process() error {
+	// Set error for use in this method
+	var err error
+
 	// Use downloader utility to download image from URL
-	err := i.utils.Downloader.Download()
+	err = i.utils.Downloader.Download()
+	if err != nil {
+		// Return bad request error
+		return NewError(http.StatusBadRequest, err.Error())
+	}
+
+	// Create mutable image object to process
+	i.utils.MutableImage, err = mutableimages.NewMutableImage(i.RawData(), i.MimeType())
 	if err != nil {
 		// Return bad request error
 		return NewError(http.StatusBadRequest, err.Error())
@@ -105,9 +124,28 @@ func (i *Image) Url() *url.URL {
 // setCustomHeaders is used to set headers with values specific to the image
 // on the response
 func (i *Image) setCustomHeaders() {
-	// Set various custom headers with data from the image
-	i.ctx.SetHeader(HEADER_MIME, i.MimeType())
-	i.ctx.SetHeader(HEADER_SOURCE_URL, i.Url().String())
+	// Map of headers to set
+	var (
+		headers map[string]string = map[string]string{
+			HEADER_ANIMATED:   helpers.Bool2String(i.utils.MutableImage.Img().Animated),
+			HEADER_MIME:       i.MimeType(),
+			HEADER_SOURCE_URL: i.Url().String(),
+		}
+	)
+
+	// Set source  and final dimensions
+	headers[HEADER_FINAL_DIMENSIONS] = helpers.Int642String(i.utils.MutableImage.GetWidth())
+	headers[HEADER_FINAL_DIMENSIONS] += "x"
+	headers[HEADER_FINAL_DIMENSIONS] += helpers.Int642String(i.utils.MutableImage.GetHeight())
+
+	headers[HEADER_SOURCE_DIMENSIONS] = helpers.Int642String(i.utils.MutableImage.Img().SourceWidth)
+	headers[HEADER_SOURCE_DIMENSIONS] += "x"
+	headers[HEADER_SOURCE_DIMENSIONS] += helpers.Int642String(i.utils.MutableImage.Img().SourceHeight)
+
+	// Loop through headers, setting each in turn
+	for k, v := range headers {
+		i.ctx.SetHeader(k, v)
+	}
 }
 
 /* End utility methods */
