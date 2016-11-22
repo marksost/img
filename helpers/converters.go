@@ -9,6 +9,11 @@ import (
 	log "github.com/Sirupsen/logrus"
 )
 
+// Bool2String converts a bool to a string
+func Bool2String(v bool) string {
+	return strconv.FormatBool(v)
+}
+
 // Float642String converts a float64 to a string
 func Float642String(v float64) string {
 	return strconv.FormatFloat(v, 'f', -1, 64)

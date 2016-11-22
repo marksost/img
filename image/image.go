@@ -16,6 +16,8 @@ import (
 
 const (
 	// Custom header to be set containing the source dimensions for the image
+	HEADER_ANIMATED = "X-Animated"
+	// Custom header to be set containing the source dimensions for the image
 	HEADER_FINAL_DIMENSIONS = "X-Final-Image-Dimensions"
 	// Custom header to be set containing the MIME type of the image
 	HEADER_MIME = "X-MIME-Type"
@@ -125,6 +127,7 @@ func (i *Image) setCustomHeaders() {
 	// Map of headers to set
 	var (
 		headers map[string]string = map[string]string{
+			HEADER_ANIMATED:   helpers.Bool2String(i.utils.MutableImage.Img().Animated),
 			HEADER_MIME:       i.MimeType(),
 			HEADER_SOURCE_URL: i.Url().String(),
 		}

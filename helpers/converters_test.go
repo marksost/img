@@ -8,6 +8,32 @@ import (
 )
 
 var _ = Describe("converters.go", func() {
+	Describe("`Bool2String` method", func() {
+		var (
+			// Input for `Bool2String` input
+			input map[bool]string
+		)
+
+		BeforeEach(func() {
+			// Set input
+			input = map[bool]string{
+				true:  "true",
+				false: "false",
+			}
+		})
+
+		It("Converts a bool to a string", func() {
+			// Loop through test data
+			for input, expected := range input {
+				// Call method
+				actual := Bool2String(input)
+
+				// Verify return value
+				Expect(actual).To(Equal(expected))
+			}
+		})
+	})
+
 	Describe("`Float642String` method", func() {
 		var (
 			// Input for `Float642String` input
