@@ -40,6 +40,8 @@ func NewGifMutableImage(img *ProcessableImage) (*GifMutableImage, error) {
 	return i, nil
 }
 
+/* Begin dimension methods */
+
 // GetWidth returns the width of the image
 // NOTE: This width is based on the current image data available,
 // meaning it may be different from the original width of the image
@@ -55,6 +57,20 @@ func (i *GifMutableImage) GetWidth() int64 {
 func (i *GifMutableImage) GetHeight() int64 {
 	return int64(i.height)
 }
+
+/* End dimension methods */
+
+/* Begin operation methods */
+
+// Resize performs a resize operation in the image
+// based on input width/height values
+func (i *GifMutableImage) Resize(w, h int64) error {
+	return nil
+}
+
+/* End operation methods */
+
+/* Begin internal property methods */
 
 // Img returns a mutable image's processable image property
 func (i *GifMutableImage) Img() *ProcessableImage {
@@ -74,3 +90,5 @@ func (i *GifMutableImage) SetDimensions() {
 	i.width = bounds.Dx()
 	i.height = bounds.Dy()
 }
+
+/* End internal property methods */

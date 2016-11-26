@@ -34,6 +34,9 @@ type (
 
 	// Struct containing configuration settings for image processing
 	Images struct {
+		// Max-width of the image before switching interpolators
+		InterpolatorThreshold int64 `json:"interpolator-threshold" env:"IMAGE_INTERPOLATOR_THRESHOLD"`
+		// Default quality all images should be output at without request overrides
 		DefaultQuality int `json:"default-quality" env:"IMAGE_DEFAULT_QUALITY"`
 	}
 
@@ -118,6 +121,7 @@ func (c *Config) setDefaults() {
 
 	// Image defaults
 	c.Images.DefaultQuality = 75
+	c.Images.InterpolatorThreshold = 300
 
 	// Logger defaults
 	c.Log.Formatter = "text"

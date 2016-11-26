@@ -165,6 +165,33 @@ var _ = Describe("converters.go", func() {
 		})
 	})
 
+	Describe("`String2Float64` method", func() {
+		var (
+			// Input for `String2Float64` input
+			input map[string]float64
+		)
+
+		BeforeEach(func() {
+			// Set input
+			input = map[string]float64{
+				"foo":   0.0,
+				"1234":  1234,
+				"12.34": 12.34,
+			}
+		})
+
+		It("Converts a string to a float64", func() {
+			// Loop through test data
+			for input, expected := range input {
+				// Call method
+				actual := String2Float64(input)
+
+				// Verify return value
+				Expect(actual).To(Equal(expected))
+			}
+		})
+	})
+
 	Describe("`String2Int` method", func() {
 		var (
 			// Input for `String2Int` input

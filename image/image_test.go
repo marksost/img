@@ -2,7 +2,12 @@
 package image
 
 import (
+	// Standard lib
+	"io/ioutil"
+	"path"
+
 	// Internal
+	"github.com/marksost/img/image/mutableimages"
 	"github.com/marksost/img/image/utils"
 
 	// Third-party
@@ -37,15 +42,28 @@ var _ = Describe("image.go", func() {
 
 			// Verify image was properly created and returned
 			Expect(i).To(Not(BeNil()))
-			Expect(len(i.outputData)).To(Equal(0))
 		})
 	})
 
 	Describe("Image internal property methods", func() {
 		Describe("`Data` method", func() {
 			BeforeEach(func() {
-				// Set data
-				i.outputData = []byte("this is some test data")
+				// Reset data
+				data, err := ioutil.ReadFile(path.Join("../test/images/1x1.gif"))
+				if err != nil {
+					panic("Error reading image. Tests cannot continue. " + err.Error())
+				}
+
+				// Create mi
+				mi, err := mutableimages.NewMutableImage(data, utils.GIF_MIME)
+				if err != nil {
+					panic("Error creating mutable image. Tests cannot continue. " + err.Error())
+				}
+
+				// Set new utility structs to ensure predictable values
+				i.utils = &ImageUtils{
+					MutableImage: mi,
+				}
 			})
 
 			It("Returns a byte slice of data", func() {
@@ -53,7 +71,7 @@ var _ = Describe("image.go", func() {
 				data := i.Data()
 
 				// Verify return value
-				Expect(string(data)).To(Equal("this is some test data"))
+				Expect(len(data)).To(Not(Equal(0)))
 			})
 		})
 	})

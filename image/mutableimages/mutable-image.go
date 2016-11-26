@@ -19,6 +19,7 @@ type (
 
 		// Operation methods
 		// TO-DO: Write these and their signatures
+		Resize(int64, int64) error
 
 		// Internal property methods
 		Img() *ProcessableImage

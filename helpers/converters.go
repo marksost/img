@@ -55,6 +55,22 @@ func MapFromInterface(i interface{}) map[string]interface{} {
 	return i.(map[string]interface{})
 }
 
+// String2Float64 converts a string to a float64
+func String2Float64(v string) float64 {
+	f, err := strconv.ParseFloat(v, 64)
+	if err != nil {
+		// Log conversion error
+		log.WithFields(log.Fields{
+			"string": v,
+			"error":  err.Error(),
+		}).Warn("Error converting string to float64")
+
+		return 0.0
+	}
+
+	return f
+}
+
 // String2Int converts a string to an int
 func String2Int(v string) int {
 	return int(String2Int64(v))
