@@ -56,9 +56,8 @@ func NewImage(ctx *iris.Context) *Image {
 	return &Image{
 		ctx: ctx,
 		utils: &ImageUtils{
-			Downloader: utils.NewDownloader(ctx.Param("img")),
-			// TO-DO: Better way to get query string from Iris?
-			OperationController: operations.NewOperationController(ctx.RequestCtx.URI().QueryString()),
+			Downloader:          utils.NewDownloader(ctx.Param("img")),
+			OperationController: operations.NewOperationController(ctx.GetRequestCtx().URI().QueryString()),
 		},
 	}
 }
@@ -71,8 +70,7 @@ func (i *Image) Process() error {
 	var err error
 
 	// Use downloader utility to download image from URL
-	err = i.utils.Downloader.Download()
-	if err != nil {
+	if err = i.utils.Downloader.Download(); err != nil {
 		// Return bad request error
 		return NewError(http.StatusBadRequest, err.Error())
 	}
@@ -85,8 +83,7 @@ func (i *Image) Process() error {
 	}
 
 	// Process mutable image, returning an error if one occurred
-	err = i.utils.OperationController.Process(&i.utils.MutableImage)
-	if err != nil {
+	if err = i.utils.OperationController.Process(&i.utils.MutableImage); err != nil {
 		// Return bad request error
 		return NewError(http.StatusBadRequest, err.Error())
 	}

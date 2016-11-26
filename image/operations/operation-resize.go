@@ -8,9 +8,6 @@ import (
 	// Internal
 	"github.com/marksost/img/helpers"
 	"github.com/marksost/img/image/mutableimages"
-
-	// Third-party
-	log "github.com/Sirupsen/logrus"
 )
 
 type (
@@ -97,8 +94,6 @@ func (o *ResizeOperation) parse() error {
 	if err != nil {
 		return err
 	}
-
-	log.WithField("dims", o.dimensions).Info("Dims")
 
 	return nil
 }

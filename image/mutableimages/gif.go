@@ -5,7 +5,16 @@ package mutableimages
 import (
 	// Standard lib
 	"bytes"
+	"fmt"
 	"image/gif"
+	"os/exec"
+)
+
+const (
+	// The command to exec when manipulating a GIF
+	GIF_COMMAND = "gifsicle"
+	// The command argument used to resize a GIF
+	GIF_RESIZE_COMMAND = "--resize=%dx%d"
 )
 
 type (
@@ -65,6 +74,27 @@ func (i *GifMutableImage) GetHeight() int64 {
 // Resize performs a resize operation in the image
 // based on input width/height values
 func (i *GifMutableImage) Resize(w, h int64) error {
+	// Form command arguments
+	args := []string{
+		fmt.Sprintf(GIF_RESIZE_COMMAND, w, h),
+	}
+
+	// Run command
+	data, err := i.runCommand(args)
+	if err != nil {
+		return err
+	}
+
+	// Reset image data and attempt to decode the image
+	i.img.Data = data
+	i.decodedData, err = gif.DecodeAll(bytes.NewBuffer(i.img.Data))
+	if err != nil {
+		return err
+	}
+
+	// Reset dimensions for the image data
+	i.SetDimensions()
+
 	return nil
 }
 
@@ -92,3 +122,29 @@ func (i *GifMutableImage) SetDimensions() {
 }
 
 /* End internal property methods */
+
+/* Begin utility methods */
+
+// runCommand runs a GIF command on the host system, with one or more arguments passed in
+// and returns the data returned by the command when possible
+func (i *GifMutableImage) runCommand(args []string) ([]byte, error) {
+	var (
+		// Command output
+		output bytes.Buffer
+	)
+
+	// Form command
+	cmd := exec.Command(GIF_COMMAND, args...)
+	cmd.Stdin = bytes.NewReader(i.img.Data)
+	cmd.Stdout = &output
+
+	// Run command
+	if err := cmd.Run(); err != nil {
+		return nil, err
+	}
+
+	// Return output as bytes
+	return output.Bytes(), nil
+}
+
+/* End utility methods */
