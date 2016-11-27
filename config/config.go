@@ -34,10 +34,10 @@ type (
 
 	// Struct containing configuration settings for image processing
 	Images struct {
-		// Max-width of the image before switching interpolators
-		InterpolatorThreshold int64 `json:"interpolator-threshold" env:"IMAGE_INTERPOLATOR_THRESHOLD"`
 		// Default quality all images should be output at without request overrides
 		DefaultQuality int `json:"default-quality" env:"IMAGE_DEFAULT_QUALITY"`
+		// Max-width of the image before switching interpolators
+		InterpolatorThreshold int64 `json:"interpolator-threshold" env:"IMAGE_INTERPOLATOR_THRESHOLD"`
 	}
 
 	// Struct containing configuration settings for application logging
