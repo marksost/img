@@ -12,6 +12,41 @@ import (
 	. "github.com/onsi/gomega"
 )
 
+type (
+	// Struct representing Dimension2Pixels input data
+	Dimension2PixelsTestData struct {
+		Dimension       string
+		SourceDimension int64
+		ReturnDimension int64
+		ReturnWildcard  bool
+		ReturnsError    bool
+	}
+	// Struct representing NewDimensionValues input data
+	NewDimensionValuesTestData struct {
+		Width        string
+		Height       string
+		SourceWidth  int64
+		SourceHeight int64
+		ReturnWidth  int64
+		ReturnHeight int64
+		ReturnsError bool
+	}
+	// Struct representing Ratio2Pixels input data
+	Ratio2PixelsTestData struct {
+		Dimension       string
+		SourceDimension int64
+		ReturnDimension int64
+		ReturnsError    bool
+	}
+	// Struct representing RatioFromDimension input data
+	RatioFromDimensionTestData struct {
+		Numerator    int64
+		Denominator  int64
+		ReturnRatio  float64
+		ReturnsError bool
+	}
+)
+
 // Tests the operations package
 func TestConfig(t *testing.T) {
 	// Register gomega fail handler

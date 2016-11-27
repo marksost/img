@@ -67,6 +67,7 @@ func NewDimensionValues(w, h string, sw, sh int64) (*DimensionValues, error) {
 
 // Dimension2Pixels converts a single dimension (width or height)
 // from a number of different formats into pixels when possible
+// NOTE: The second return value indicates if the dimension is a "wildcard" or not
 func Dimension2Pixels(dimension string, sourceDimension int64) (int64, bool, error) {
 	// Check if dimension is a wildcard
 	if dimension == DIMENSION_WILDCARD {
@@ -82,7 +83,7 @@ func Dimension2Pixels(dimension string, sourceDimension int64) (int64, bool, err
 
 	// Convert string to int64
 	// NOTE: String2Int64 abstracts conversion errors away, thus the extra value check
-	if px := helpers.String2Int64(dimension); px != 0 || dimension != "0" {
+	if px := helpers.String2Int64(dimension); px != 0 {
 		return px, false, nil
 	}
 
