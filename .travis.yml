@@ -2,11 +2,9 @@ language: go
 
 go:
   - 1.7
-  - master
 
 env:
   - LIBVIPS=8.4
-  - LIBVIPS=master
 
 cache: apt
 
