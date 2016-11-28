@@ -62,6 +62,11 @@ func (o *ResizeOperation) String() string {
 // Validate returns a boolean indicating if the operation can be run,
 // including checking source image against proposed operation parameters
 func (o *ResizeOperation) Validate() error {
+	// Verify dimensions exist
+	if o.dimensions == nil {
+		return fmt.Errorf("Invalid dimensions. Operation appears to not have been initialized")
+	}
+
 	// Verify target dimensions
 	if o.dimensions.Width == 0 || o.dimensions.Height == 0 {
 		return fmt.Errorf("Invalid target dimensions detected: %v", o.dimensions)

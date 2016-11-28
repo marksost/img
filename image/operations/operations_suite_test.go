@@ -3,8 +3,12 @@ package operations
 
 import (
 	// Standard lib
+	"fmt"
 	"io/ioutil"
 	"testing"
+
+	// Internal
+	"github.com/marksost/img/image/mutableimages"
 
 	// Third-party
 	log "github.com/Sirupsen/logrus"
@@ -21,6 +25,10 @@ type (
 		ReturnWildcard  bool
 		ReturnsError    bool
 	}
+	// Struct represention an operation that errors out
+	MockOperationWithError struct{}
+	// Struct represention an operation that does not error out
+	MockOperationWithoutError struct{}
 	// Struct representing NewDimensionValues input data
 	NewDimensionValuesTestData struct {
 		Width        string
@@ -55,6 +63,30 @@ func TestConfig(t *testing.T) {
 	// Have go's testing package run package specs
 	RunSpecs(t, "Image Operations Suite")
 }
+
+/* Begin mock operation generation */
+
+// Mock operations's Process method
+func (o *MockOperationWithError) Process(mi *mutableimages.MutableImage) error {
+	return fmt.Errorf("Error")
+}
+
+// Mock operations's Validate method
+func (o *MockOperationWithError) Validate() error { return nil }
+
+// Mock operations's String method
+func (o *MockOperationWithError) String() string { return "mock-operation-with-error" }
+
+// Mock operations's Process method
+func (o *MockOperationWithoutError) Process(mi *mutableimages.MutableImage) error { return nil }
+
+// Mock operations's Validate method
+func (o *MockOperationWithoutError) Validate() error { return nil }
+
+// Mock operations's String method
+func (o *MockOperationWithoutError) String() string { return "mock-operation-without-error" }
+
+/* End mock operation generation */
 
 func init() {
 	// Set logger output so as not to log during tests
