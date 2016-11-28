@@ -33,7 +33,7 @@ type (
 	// Inteface all image operations must satisfy
 	Operation interface {
 		// Public interface methods
-		Process(mi *mutableimages.MutableImage) error
+		Process(*mutableimages.MutableImage) error
 		Validate() error
 
 		// Internal property methods
