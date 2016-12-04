@@ -10,12 +10,10 @@ import (
 )
 
 const (
-	// The delimiter to be used when splitting dimension strings
-	DIMENSION_DELIMITER = ":"
-	// The value used to indicate a dimension is considered a "wildcard"
-	DIMENSION_WILDCARD = "*"
 	// The max number of operations allowed to be run per-request
 	MAX_OPERATIONS = 5
+	// The name of the crop operation
+	OPERATION_NAME_CROP = "crop"
 	// The name of the resize operation
 	OPERATION_NAME_RESIZE = "resize"
 	// The delimiter to be used when splitting query strings
@@ -25,11 +23,6 @@ const (
 )
 
 type (
-	// Struct representing a set of dimension width/height values
-	DimensionValues struct {
-		Width  int64
-		Height int64
-	}
 	// Inteface all image operations must satisfy
 	Operation interface {
 		// Public interface methods
@@ -54,6 +47,8 @@ func NewOperation(operationType, value string) (Operation, error) {
 	var op Operation
 
 	switch operationType {
+	case "crop":
+		op = &CropOperation{rawValue: value}
 	case "resize":
 		op = &ResizeOperation{rawValue: value}
 	default:

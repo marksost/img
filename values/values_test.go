@@ -1,5 +1,5 @@
-// Tests the utils.go file
-package operations
+// Tests the values.go file
+package values
 
 import (
 	// Third-party
@@ -7,7 +7,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("utils.go", func() {
+var _ = Describe("values.go", func() {
 	Describe("`NewDimensionValues` method", func() {
 		var (
 			// Input for `NewDimensionValues` input
@@ -111,6 +111,90 @@ var _ = Describe("utils.go", func() {
 					Expect(err).To(Not(HaveOccurred()))
 					Expect(dims.Width).To(Equal(data.ReturnWidth))
 					Expect(dims.Height).To(Equal(data.ReturnHeight))
+				}
+			}
+		})
+	})
+
+	Describe("`NewPointValues` method", func() {
+		var (
+			// Input for `NewPointValues` input
+			input []*NewPointValuesTestData
+		)
+
+		BeforeEach(func() {
+			// Set input
+			input = []*NewPointValuesTestData{
+				// X errors out
+				&NewPointValuesTestData{
+					X:            "0.0xw",
+					Y:            "100",
+					ReturnsError: true,
+				},
+				// Y errors out
+				&NewPointValuesTestData{
+					X:            "100",
+					Y:            "0.0xh",
+					ReturnsError: true,
+				},
+				// X is negative
+				&NewPointValuesTestData{
+					X:       "-1",
+					Y:       "100",
+					ReturnX: 0,
+					ReturnY: 100,
+				},
+				// Y is negative
+				&NewPointValuesTestData{
+					X:       "100",
+					Y:       "-1",
+					ReturnX: 100,
+					ReturnY: 0,
+				},
+				// Valid inputs
+				// Both x/y
+				&NewPointValuesTestData{
+					X:            "100", // pixels
+					Y:            "100", // pixels
+					SourceWidth:  200,
+					SourceHeight: 300,
+					ReturnX:      100,
+					ReturnY:      100,
+				},
+				// X relative value
+				&NewPointValuesTestData{
+					X:            "0.5xw", // relative
+					Y:            "100",   // pixels
+					SourceWidth:  200,
+					SourceHeight: 300,
+					ReturnX:      100,
+					ReturnY:      100,
+				},
+				// Y relative value
+				&NewPointValuesTestData{
+					X:            "100",   // pixels
+					Y:            "0.5xh", // relative
+					SourceWidth:  200,
+					SourceHeight: 300,
+					ReturnX:      100,
+					ReturnY:      150,
+				},
+			}
+		})
+
+		It("Returns either a set of valid point values or an error", func() {
+			// Loop through test data
+			for _, data := range input {
+				// Call method
+				dims, err := NewPointValues(data.X, data.Y, data.SourceWidth, data.SourceHeight)
+
+				// Verify return value
+				if data.ReturnsError {
+					Expect(err).To(HaveOccurred())
+				} else {
+					Expect(err).To(Not(HaveOccurred()))
+					Expect(dims.X).To(Equal(data.ReturnX))
+					Expect(dims.Y).To(Equal(data.ReturnY))
 				}
 			}
 		})
