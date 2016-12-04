@@ -1,6 +1,4 @@
-// operation util methods are used to help manipulate operation parameters
-// like dimensions and crop values
-package operations
+package values
 
 import (
 	// Standard lib
@@ -8,6 +6,37 @@ import (
 
 	// Internal
 	"github.com/marksost/img/helpers"
+)
+
+const (
+	// The delimiter to be used when splitting crop strings
+	CROP_DELIMITER = ";"
+	// The value used to indicate a dimension is considered a "wildcard"
+	DIMENSION_WILDCARD = "*"
+	// The delimiter to be used when splitting dimension strings
+	DIMENSION_DELIMITER = ":"
+	// The delimiter to be used when splitting point strings
+	POINT_DELIMITER = ","
+)
+
+type (
+	// Struct representing a set of crop values
+	CropValues struct {
+		Width  int64
+		Height int64
+		X      int64
+		Y      int64
+	}
+	// Struct representing a set of dimension width/height values
+	DimensionValues struct {
+		Width  int64
+		Height int64
+	}
+	// Struct representing a set of X/Y coordinates corresponing to a "point"
+	PointValues struct {
+		X int64
+		Y int64
+	}
 )
 
 // NewDimensionValues takes width and height string values (gotten from a request)
@@ -63,6 +92,40 @@ func NewDimensionValues(w, h string, sw, sh int64) (*DimensionValues, error) {
 	}
 
 	return &DimensionValues{Width: pWidth, Height: pHeight}, nil
+}
+
+// NewPointValues takes x and y string values (gotten from a request)
+// and converts them, using source dimensions if needed, into an ordered struct
+// of x and y int64's for use within operations
+func NewPointValues(x, y string, sw, sh int64) (*PointValues, error) {
+	var (
+		// Error to be used throughout this method
+		err error
+		// X and Y in pixels
+		pX, pY int64
+	)
+
+	// Get X in pixels
+	if pX, _, err = Dimension2Pixels(x, sw); err != nil {
+		return nil, err
+	}
+
+	// Get Y in pixels
+	if pY, _, err = Dimension2Pixels(y, sh); err != nil {
+		return nil, err
+	}
+
+	// Verify X value
+	if pX < 0 {
+		pX = 0
+	}
+
+	// Verify Y value
+	if pY < 0 {
+		pY = 0
+	}
+
+	return &PointValues{X: pX, Y: pY}, nil
 }
 
 // Dimension2Pixels converts a single dimension (width or height)

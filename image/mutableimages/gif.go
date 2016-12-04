@@ -8,11 +8,16 @@ import (
 	"fmt"
 	"image/gif"
 	"os/exec"
+
+	// Internal
+	"github.com/marksost/img/values"
 )
 
 const (
 	// The command to exec when manipulating a GIF
 	GIF_COMMAND = "gifsicle"
+	// The command argument used to crop a GIF
+	GIF_CROP_COMMAND = "--crop=%d,%d+%dx%d"
 	// The command argument used to resize a GIF
 	GIF_RESIZE_COMMAND = "--resize=%dx%d"
 )
@@ -71,31 +76,28 @@ func (i *GifMutableImage) GetHeight() int64 {
 
 /* Begin operation methods */
 
-// Resize performs a resize operation in the image
-// based on input width/height values
-func (i *GifMutableImage) Resize(w, h int64) error {
+// Crop performs a crop operation on the image
+// based on input width/height/x/y values
+func (i *GifMutableImage) Crop(vals *values.CropValues) error {
 	// Form command arguments
 	args := []string{
-		fmt.Sprintf(GIF_RESIZE_COMMAND, w, h),
+		fmt.Sprintf(GIF_CROP_COMMAND, vals.X, vals.Y, vals.Width, vals.Height),
 	}
 
-	// Run command
-	data, err := i.runCommand(args)
-	if err != nil {
-		return err
+	// Return value of internal command call
+	return i.runCommand(args)
+}
+
+// Resize performs a resize operation on the image
+// based on input width/height values
+func (i *GifMutableImage) Resize(vals *values.DimensionValues) error {
+	// Form command arguments
+	args := []string{
+		fmt.Sprintf(GIF_RESIZE_COMMAND, vals.Width, vals.Height),
 	}
 
-	// Reset image data and attempt to decode the image
-	i.img.Data = data
-	i.decodedData, err = gif.DecodeAll(bytes.NewBuffer(i.img.Data))
-	if err != nil {
-		return err
-	}
-
-	// Reset dimensions for the image data
-	i.SetDimensions()
-
-	return nil
+	// Return value of internal command call
+	return i.runCommand(args)
 }
 
 /* End operation methods */
@@ -127,8 +129,10 @@ func (i *GifMutableImage) SetDimensions() {
 
 // runCommand runs a GIF command on the host system, with one or more arguments passed in
 // and returns the data returned by the command when possible
-func (i *GifMutableImage) runCommand(args []string) ([]byte, error) {
+func (i *GifMutableImage) runCommand(args []string) error {
 	var (
+		// Set error for use in this method
+		err error
 		// Command output
 		output bytes.Buffer
 	)
@@ -139,12 +143,20 @@ func (i *GifMutableImage) runCommand(args []string) ([]byte, error) {
 	cmd.Stdout = &output
 
 	// Run command
-	if err := cmd.Run(); err != nil {
-		return nil, err
+	if err = cmd.Run(); err != nil {
+		return err
 	}
 
-	// Return output as bytes
-	return output.Bytes(), nil
+	// Reset image data and attempt to decode the image
+	i.img.Data = output.Bytes()
+	if i.decodedData, err = gif.DecodeAll(bytes.NewBuffer(i.img.Data)); err != nil {
+		return err
+	}
+
+	// Reset dimensions for the image data
+	i.SetDimensions()
+
+	return nil
 }
 
 /* End utility methods */

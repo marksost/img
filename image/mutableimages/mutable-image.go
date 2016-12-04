@@ -8,6 +8,7 @@ import (
 
 	// Internal
 	"github.com/marksost/img/image/utils"
+	"github.com/marksost/img/values"
 )
 
 type (
@@ -18,8 +19,8 @@ type (
 		GetHeight() int64
 
 		// Operation methods
-		// TO-DO: Write these and their signatures
-		Resize(int64, int64) error
+		Crop(*values.CropValues) error
+		Resize(*values.DimensionValues) error
 
 		// Internal property methods
 		Img() *ProcessableImage

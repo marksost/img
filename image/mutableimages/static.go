@@ -6,6 +6,7 @@ package mutableimages
 import (
 	// Internal
 	"github.com/marksost/img/config"
+	"github.com/marksost/img/values"
 
 	// Third-party
 	"github.com/h2non/bimg"
@@ -62,36 +63,46 @@ func (i *StaticMutableImage) GetHeight() int64 {
 
 /* Begin operation methods */
 
-// Resize performs a resize operation in the image
-// based on input width/height values
-func (i *StaticMutableImage) Resize(w, h int64) error {
+// Crop performs a crop operation on the image
+// based on input width/height/x/y values
+func (i *StaticMutableImage) Crop(vals *values.CropValues) error {
 	// Form options
 	opts := bimg.Options{
-		Width:        int(w),
-		Height:       int(h),
+		Top:        int(vals.Y),
+		Left:       int(vals.X),
+		AreaWidth:  int(vals.Width),
+		AreaHeight: int(vals.Height),
+		Quality:    100,
+	}
+
+	// Reset top if the point is the top-left corner
+	if opts.Top == 0 && opts.Left == 0 {
+		opts.Top = -1
+	}
+
+	// Return value of internal resize call
+	return i.resize(opts)
+}
+
+// Resize performs a resize operation on the image
+// based on input width/height values
+func (i *StaticMutableImage) Resize(vals *values.DimensionValues) error {
+	// Form options
+	opts := bimg.Options{
+		Width:        int(vals.Width),
+		Height:       int(vals.Height),
 		Quality:      100,
 		Force:        true,
 		Interpolator: bimg.Bilinear,
 	}
 
 	// Switch interpolator if needed
-	if w <= i.interpolatorThreshold {
+	if vals.Width <= i.interpolatorThreshold {
 		opts.Interpolator = bimg.Bicubic
 	}
 
-	// Resize image
-	data, err := bimg.Resize(i.img.Data, opts)
-	if err != nil {
-		return err
-	}
-
-	// Reset image data
-	i.img.Data = data
-
-	// Reset dimensions for the image data
-	i.SetDimensions()
-
-	return nil
+	// Return value of internal resize call
+	return i.resize(opts)
 }
 
 /* End operation methods */
@@ -125,3 +136,25 @@ func (i *StaticMutableImage) SetDimensions() {
 }
 
 /* End internal property methods */
+
+/* Begin utility methods */
+
+// resize takes a set of bimg options and calls for a `resize` on the image data
+// NOTE: `resize` handles more than just resizing of an image (ex: cropping)
+func (i *StaticMutableImage) resize(opts bimg.Options) error {
+	// Resize image with opts
+	data, err := bimg.Resize(i.img.Data, opts)
+	if err != nil {
+		return err
+	}
+
+	// Reset image data
+	i.img.Data = data
+
+	// Reset dimensions for the image data
+	i.SetDimensions()
+
+	return nil
+}
+
+/* End utility methods */
