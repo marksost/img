@@ -16,7 +16,7 @@ import (
 const (
 	// The conversion factor to use for quality operations
 	// NOTE: Quality can be anywhere from 1 to 100, so this converts
-	// if to a colors value between 2 and 256
+	// it to a colors value between 2 and 256
 	GIF_QUALITY_FACTOR = 2.56
 	// The command to exec when manipulating a GIF
 	GIF_COMMAND = "gifsicle"
@@ -99,7 +99,6 @@ func (i *GifMutableImage) Crop(vals *values.CropValues) error {
 func (i *GifMutableImage) Quality(val int64) error {
 	// Form command arguments
 	args := []string{
-		// NOTE: Quality
 		fmt.Sprintf(GIF_QUALITY_COMMAND, int64((float64(val) * GIF_QUALITY_FACTOR))),
 	}
 
