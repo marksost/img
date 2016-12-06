@@ -100,7 +100,7 @@ var _ = Describe("static.go", func() {
 				mi.SetDefaults()
 
 				// Verify defaults were set
-				Expect(mi.quality).To(Equal(config.GetInstance().Images.DefaultQuality))
+				Expect(mi.interpolatorThreshold).To(Equal(config.GetInstance().Images.InterpolatorThreshold))
 			})
 		})
 

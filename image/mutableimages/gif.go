@@ -14,10 +14,16 @@ import (
 )
 
 const (
+	// The conversion factor to use for quality operations
+	// NOTE: Quality can be anywhere from 1 to 100, so this converts
+	// it to a colors value between 2 and 256
+	GIF_QUALITY_FACTOR = 2.56
 	// The command to exec when manipulating a GIF
 	GIF_COMMAND = "gifsicle"
 	// The command argument used to crop a GIF
 	GIF_CROP_COMMAND = "--crop=%d,%d+%dx%d"
+	// The command argument used to change the quality of a GIF
+	GIF_QUALITY_COMMAND = "--colors=%d"
 	// The command argument used to resize a GIF
 	GIF_RESIZE_COMMAND = "--resize=%dx%d"
 )
@@ -82,6 +88,18 @@ func (i *GifMutableImage) Crop(vals *values.CropValues) error {
 	// Form command arguments
 	args := []string{
 		fmt.Sprintf(GIF_CROP_COMMAND, vals.X, vals.Y, vals.Width, vals.Height),
+	}
+
+	// Return value of internal command call
+	return i.runCommand(args)
+}
+
+// Quality performs a quality operation on the image
+// based on input value
+func (i *GifMutableImage) Quality(val int64) error {
+	// Form command arguments
+	args := []string{
+		fmt.Sprintf(GIF_QUALITY_COMMAND, int64((float64(val) * GIF_QUALITY_FACTOR))),
 	}
 
 	// Return value of internal command call

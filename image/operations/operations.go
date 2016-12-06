@@ -14,6 +14,10 @@ const (
 	MAX_OPERATIONS = 5
 	// The name of the crop operation
 	OPERATION_NAME_CROP = "crop"
+	// The name of the quality operation
+	OPERATION_NAME_OUTPUT_QUALITY = "output-quality"
+	// The name of the quality operation
+	OPERATION_NAME_QUALITY = "quality"
 	// The name of the resize operation
 	OPERATION_NAME_RESIZE = "resize"
 	// The delimiter to be used when splitting query strings
@@ -36,6 +40,9 @@ type (
 	OperationController struct {
 		// A slice of zero or more operations to run on an image
 		Operations []Operation
+		// A special operation that handles image quality manipulation
+		// after all other operations are run
+		QualityOperation Operation
 		// A string representing the raw query string from the request
 		queryString string
 	}
@@ -47,9 +54,11 @@ func NewOperation(operationType, value string) (Operation, error) {
 	var op Operation
 
 	switch operationType {
-	case "crop":
+	case OPERATION_NAME_CROP:
 		op = &CropOperation{rawValue: value}
-	case "resize":
+	case OPERATION_NAME_OUTPUT_QUALITY, OPERATION_NAME_QUALITY:
+		op = &QualityOperation{rawValue: value}
+	case OPERATION_NAME_RESIZE:
 		op = &ResizeOperation{rawValue: value}
 	default:
 		return nil, fmt.Errorf("Unsupported operation type: %s", operationType)
@@ -63,6 +72,8 @@ func NewOperationController(qs []byte) *OperationController {
 	// Create new operation controller
 	oc := &OperationController{
 		Operations: make([]Operation, 0, MAX_OPERATIONS),
+		// Set default quality operation
+		QualityOperation: &QualityOperation{rawValue: "0"},
 		// NOTE: String conversion here may cause weirdness with non-UTF-8 chars
 		queryString: string(qs),
 	}
@@ -83,6 +94,11 @@ func (oc *OperationController) Process(mi *mutableimages.MutableImage) error {
 		if err := op.Process(mi); err != nil {
 			return err
 		}
+	}
+
+	// Process quality if needed
+	if oc.QualityOperation != nil {
+		oc.QualityOperation.Process(mi)
 	}
 
 	return nil
@@ -122,7 +138,14 @@ func (oc *OperationController) filterParams() {
 			continue
 		}
 
-		// Append new operation to operations slice
-		oc.Operations = append(oc.Operations, operation)
+		// Set quality operation if needed
+		// NOTE: Only one quality operation can be run on an image, and should be run last,
+		// meaning multiple quality query string arguments will override each other
+		if bits[0] == OPERATION_NAME_OUTPUT_QUALITY || bits[0] == OPERATION_NAME_QUALITY {
+			oc.QualityOperation = operation
+		} else {
+			// Append new operation to operations slice
+			oc.Operations = append(oc.Operations, operation)			
+		}
 	}
 }
