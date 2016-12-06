@@ -145,7 +145,8 @@ func (i *Image) setCustomHeaders() {
 	)
 
 	// Loop through operations, getting their string representations
-	for _, op := range i.utils.OperationController.Operations {
+	ocOps := append(i.utils.OperationController.Operations, i.utils.OperationController.QualityOperation)
+	for _, op := range ocOps {
 		str := op.String()
 
 		if str != "" {

@@ -19,8 +19,6 @@ type (
 		img *ProcessableImage
 		// Max-width of the image before switching interpolators
 		interpolatorThreshold int64
-		// The quality to use when outputing the processed image
-		quality int
 		// The current width of the image
 		width int
 		// The current height of the image
@@ -84,6 +82,20 @@ func (i *StaticMutableImage) Crop(vals *values.CropValues) error {
 	return i.resize(opts)
 }
 
+// Quality performs a quality operation on the image
+// based on input value
+func (i *StaticMutableImage) Quality(val int64) error {
+	// Form options
+	opts := bimg.Options{
+		Interlace:      true,
+		Interpretation: bimg.InterpretationSRGB,
+		Quality:        int(val),
+	}
+
+	// Return value of internal resize call
+	return i.resize(opts)
+}
+
 // Resize performs a resize operation on the image
 // based on input width/height values
 func (i *StaticMutableImage) Resize(vals *values.DimensionValues) error {
@@ -119,7 +131,6 @@ func (i *StaticMutableImage) Img() *ProcessableImage {
 func (i *StaticMutableImage) SetDefaults() {
 	// Set defaults
 	i.interpolatorThreshold = int64(config.GetInstance().Images.InterpolatorThreshold)
-	i.quality = config.GetInstance().Images.DefaultQuality
 }
 
 // SetDimensions reads in an image and sets it's dimensions

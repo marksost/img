@@ -20,6 +20,7 @@ type (
 
 		// Operation methods
 		Crop(*values.CropValues) error
+		Quality(int64) error
 		Resize(*values.DimensionValues) error
 
 		// Internal property methods
